@@ -8,33 +8,45 @@ import (
 
 // Config holds all configuration for our application
 type Config struct {
-	App      AppConfig
-	Database DatabaseConfig
-	Redis    RedisConfig
-	JWT      JWTConfig
-	Log      LogConfig
-	AI       AIConfig
-	Upload   UploadConfig
+	App       AppConfig
+	Database  DatabaseConfig
+	Redis     RedisConfig
+	JWT       JWTConfig
+	Log       LogConfig
+	AI        AIConfig
+	Upload    UploadConfig
+	RateLimit RateLimitConfig
 }
 
 // AppConfig holds application-specific configuration
 type AppConfig struct {
-	Name    string
-	Version string
-	Env     string
-	Port    string
+	Name           string
+	Version        string
+	Environment    string
+	Port           string
+	BaseURL        string
+	ReadTimeout    int
+	WriteTimeout   int
+	IdleTimeout    int
+	MaxHeaderBytes int
+	MaxRequestSize int64
 }
 
 // DatabaseConfig holds database configuration
 type DatabaseConfig struct {
-	Host         string
-	Port         string
-	Name         string
-	User         string
-	Password     string
-	MaxOpenConns int
-	MaxIdleConns int
-	MaxLifetime  time.Duration
+	Type            string
+	Host            string
+	Port            int
+	Name            string
+	User            string
+	Password        string
+	SSLMode         string
+	Timezone        string
+	MaxOpenConns    int
+	MaxIdleConns    int
+	ConnMaxLifetime int
+	AutoMigrate     bool
+	LogLevel        string
 }
 
 // RedisConfig holds Redis configuration
@@ -49,9 +61,10 @@ type RedisConfig struct {
 
 // JWTConfig holds JWT configuration
 type JWTConfig struct {
-	Secret           string
-	ExpiresIn        time.Duration
-	RefreshExpiresIn time.Duration
+	Secret                string
+	Issuer                string
+	ExpirationHours       int
+	RefreshExpirationDays int
 }
 
 // LogConfig holds logging configuration
@@ -63,9 +76,12 @@ type LogConfig struct {
 
 // AIConfig holds AI service configuration
 type AIConfig struct {
-	OpenAI    OpenAIConfig
-	Deepgram  DeepgramConfig
-	ElevenLabs ElevenLabsConfig
+	OpenAI         OpenAIConfig
+	Deepgram       DeepgramConfig
+	ElevenLabs     ElevenLabsConfig
+	MaxTextLength    int
+	MaxMessageLength int
+	AutoTTS          bool
 }
 
 // OpenAIConfig holds OpenAI configuration
@@ -91,29 +107,45 @@ type ElevenLabsConfig struct {
 
 // UploadConfig holds file upload configuration
 type UploadConfig struct {
-	Path              string
-	MaxSize           int64
+	AudioPath         string
+	MaxFileSize       int64
 	AllowedAudioTypes []string
+}
+
+// RateLimitConfig holds rate limiting configuration
+type RateLimitConfig struct {
+	MaxRequests    int
+	WindowDuration time.Duration
 }
 
 // New creates a new configuration instance
 func New() *Config {
 	return &Config{
 		App: AppConfig{
-			Name:    getEnv("APP_NAME", "VoiceGenie"),
-			Version: getEnv("APP_VERSION", "0.1.0"),
-			Env:     getEnv("APP_ENV", "development"),
-			Port:    getEnv("APP_PORT", "8080"),
+			Name:        getEnv("APP_NAME", "VoiceGenie"),
+			Version:     getEnv("APP_VERSION", "0.1.0"),
+			Environment: getEnv("APP_ENV", "development"),
+			Port:        getEnv("APP_PORT", "8080"),
+			BaseURL:     getEnv("APP_BASE_URL", "http://localhost:8080"),
+			ReadTimeout:    getEnvAsInt("APP_READ_TIMEOUT", 30),
+			WriteTimeout:   getEnvAsInt("APP_WRITE_TIMEOUT", 30),
+			IdleTimeout:    getEnvAsInt("APP_IDLE_TIMEOUT", 60),
+			MaxHeaderBytes: getEnvAsInt("APP_MAX_HEADER_BYTES", 1048576),
+			MaxRequestSize: getEnvAsInt64("APP_MAX_REQUEST_SIZE", 10485760),
 		},
 		Database: DatabaseConfig{
 			Host:         getEnv("DB_HOST", "localhost"),
-			Port:         getEnv("DB_PORT", "5432"),
+			Port:         getEnvAsInt("DB_PORT", 5432),
 			Name:         getEnv("DB_NAME", "voicegenie"),
 			User:         getEnv("DB_USER", "postgres"),
 			Password:     getEnv("DB_PASSWORD", "postgres123"),
-			MaxOpenConns: getEnvAsInt("DB_MAX_OPEN_CONNS", 25),
-			MaxIdleConns: getEnvAsInt("DB_MAX_IDLE_CONNS", 10),
-			MaxLifetime:  getEnvAsDuration("DB_MAX_LIFETIME", 5*time.Minute),
+			MaxOpenConns:    getEnvAsInt("DB_MAX_OPEN_CONNS", 25),
+			MaxIdleConns:    getEnvAsInt("DB_MAX_IDLE_CONNS", 10),
+			ConnMaxLifetime: getEnvAsInt("DB_CONN_MAX_LIFETIME", 300),
+			AutoMigrate:     getEnvAsBool("DB_AUTO_MIGRATE", true),
+			LogLevel:        getEnv("DB_LOG_LEVEL", "warn"),
+			SSLMode:         getEnv("DB_SSL_MODE", "disable"),
+			Timezone:        getEnv("DB_TIMEZONE", "UTC"),
 		},
 		Redis: RedisConfig{
 			Host:         getEnv("REDIS_HOST", "localhost"),
@@ -124,9 +156,10 @@ func New() *Config {
 			IdleTimeout:  getEnvAsDuration("REDIS_IDLE_TIMEOUT", 5*time.Minute),
 		},
 		JWT: JWTConfig{
-			Secret:           getEnv("JWT_SECRET", "your-super-secret-jwt-key"),
-			ExpiresIn:        getEnvAsDuration("JWT_EXPIRES_IN", 24*time.Hour),
-			RefreshExpiresIn: getEnvAsDuration("JWT_REFRESH_EXPIRES_IN", 168*time.Hour),
+			Secret:                getEnv("JWT_SECRET", "your-super-secret-jwt-key"),
+			Issuer:                getEnv("JWT_ISSUER", "voicegenie"),
+			ExpirationHours:       getEnvAsInt("JWT_EXPIRATION_HOURS", 24),
+			RefreshExpirationDays: getEnvAsInt("JWT_REFRESH_EXPIRATION_DAYS", 7),
 		},
 		Log: LogConfig{
 			Level:  getEnv("LOG_LEVEL", "debug"),
@@ -149,11 +182,18 @@ func New() *Config {
 				APIURL:  getEnv("ELEVENLABS_API_URL", "https://api.elevenlabs.io/v1"),
 				VoiceID: getEnv("ELEVENLABS_VOICE_ID", "21m00Tcm4TlvDq8ikWAM"),
 			},
+			MaxTextLength:    getEnvAsInt("AI_MAX_TEXT_LENGTH", 2000),
+			MaxMessageLength: getEnvAsInt("AI_MAX_MESSAGE_LENGTH", 1000),
+			AutoTTS:          getEnvAsBool("AI_AUTO_TTS", false),
 		},
 		Upload: UploadConfig{
-			Path:              getEnv("UPLOAD_PATH", "./uploads"),
-			MaxSize:           getEnvAsInt64("UPLOAD_MAX_SIZE", 10485760), // 10MB
+			AudioPath:         getEnv("UPLOAD_AUDIO_PATH", "./uploads/audio"),
+			MaxFileSize:       getEnvAsInt64("UPLOAD_MAX_FILE_SIZE", 10485760),
 			AllowedAudioTypes: getEnvAsSlice("ALLOWED_AUDIO_TYPES", []string{"mp3", "wav", "m4a", "aac"}),
+		},
+		RateLimit: RateLimitConfig{
+			MaxRequests:    getEnvAsInt("RATE_LIMIT_MAX_REQUESTS", 100),
+			WindowDuration: getEnvAsDuration("RATE_LIMIT_WINDOW", 1*time.Minute),
 		},
 	}
 }
@@ -228,6 +268,15 @@ func splitByString(s, sep string) []string {
 	}
 	result = append(result, s[start:])
 	return result
+}
+
+func getEnvAsBool(key string, defaultValue bool) bool {
+	if value := os.Getenv(key); value != "" {
+		if boolValue, err := strconv.ParseBool(value); err == nil {
+			return boolValue
+		}
+	}
+	return defaultValue
 }
 
 func trimSpace(s string) string {
