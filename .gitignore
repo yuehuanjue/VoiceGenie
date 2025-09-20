@@ -1,0 +1,427 @@
+# =====================================
+# VoiceGenie Project .gitignore
+# =====================================
+
+# Claude Code specific files
+CLAUDE.md
+
+# =====================================
+# Environment and Configuration
+# =====================================
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Configuration files with sensitive data
+config/local.yml
+config/production.yml
+config/development.yml
+
+# =====================================
+# Node.js and Frontend
+# =====================================
+
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# ESLint cache
+.eslintcache
+
+# Prettier cache
+.prettiercache
+
+# Dependency directories
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# Next.js build output
+.next
+
+# Nuxt.js build / generate output
+.nuxt
+dist/
+
+# =====================================
+# uni-app Specific
+# =====================================
+
+# uni-app build output
+unpackage/
+
+# uni-app generated files
+src/pages.json
+src/manifest.json
+
+# HBuilderX generated files
+.hbuilderx/
+
+# uni-app temp files
+.temp/
+
+# WeChat DevTools
+project.config.json
+project.private.config.json
+
+# =====================================
+# Go Backend
+# =====================================
+
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Go workspace file
+go.work
+go.work.sum
+
+# Dependency directories
+vendor/
+
+# Go build cache
+.cache/
+
+# GoLand
+.idea/
+
+# Build outputs
+bin/
+build/
+dist/
+
+# Air live reload
+tmp/
+
+# =====================================
+# AI Services and Keys
+# =====================================
+
+# API keys and secrets
+**/keys/
+**/secrets/
+*.key
+*.pem
+*.crt
+
+# AI service configuration
+ai-config.json
+service-account.json
+
+# =====================================
+# Database
+# =====================================
+
+# SQLite
+*.sqlite
+*.sqlite3
+*.db
+
+# PostgreSQL dumps
+*.sql
+*.dump
+
+# Database data directories
+postgres_data/
+mysql_data/
+mongo_data/
+
+# Redis dumps
+dump.rdb
+
+# =====================================
+# Logs and Runtime
+# =====================================
+
+# Log files
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory
+coverage/
+
+# Monitoring data
+monitoring/
+metrics/
+
+# =====================================
+# Docker
+# =====================================
+
+# Docker override files
+docker-compose.override.yml
+docker-compose.local.yml
+
+# Docker volumes
+volumes/
+
+# Docker build context
+.dockerignore
+
+# =====================================
+# Development Tools
+# =====================================
+
+# IDE and editor files
+.vscode/settings.json
+.vscode/launch.json
+.vscode/extensions.json
+.vscode/c_cpp_properties.json
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Eclipse
+.metadata
+.project
+.classpath
+.settings/
+
+# Sublime Text
+*.sublime-*
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+
+# =====================================
+# Operating System
+# =====================================
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# =====================================
+# Backup and Temporary Files
+# =====================================
+
+# Backup files
+*.bak
+*.backup
+*.old
+*.orig
+*.save
+*.tmp
+
+# Temporary files
+*.temp
+*.swp
+*.swo
+*.pid
+*.lock
+
+# Archive files
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# =====================================
+# Audio and Media Files
+# =====================================
+
+# Audio files (except samples)
+*.wav
+*.mp3
+*.aac
+*.flac
+*.ogg
+*.m4a
+
+# Video files
+*.mp4
+*.avi
+*.mov
+*.wmv
+*.flv
+
+# Image files (large)
+*.psd
+*.ai
+*.sketch
+
+# =====================================
+# Testing and CI/CD
+# =====================================
+
+# Test results
+test-results/
+*.xml
+*.html
+
+# Coverage reports
+coverage/
+.nyc_output/
+
+# Benchmark results
+benchmark/
+
+# CI/CD artifacts
+artifacts/
+.github/workflows/*.yml.bak
+
+# =====================================
+# Package Managers
+# =====================================
+
+# Go modules
+go.sum
+
+# NPM
+package-lock.json.bak
+yarn.lock.bak
+
+# Composer (PHP)
+vendor/
+composer.lock
+
+# =====================================
+# Documentation
+# =====================================
+
+# Generated documentation
+docs/build/
+docs/_build/
+site/
+
+# API documentation
+api-docs/
+swagger-ui/
+
+# =====================================
+# Performance and Profiling
+# =====================================
+
+# Go profiling
+*.prof
+*.trace
+
+# Performance logs
+perf.data*
+
+# =====================================
+# Security
+# =====================================
+
+# SSL certificates
+*.pem
+*.key
+*.crt
+*.csr
+*.pfx
+
+# Security scan results
+.snyk
+security-report.*
+
+# =====================================
+# Custom Project Files
+# =====================================
+
+# Local development overrides
+local/
+dev/
+private/
+
+# User-specific files
+user.config
+personal.config
+
+# =====================================
+# End of .gitignore
+# =====================================
